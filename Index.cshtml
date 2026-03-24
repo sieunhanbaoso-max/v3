@@ -916,15 +916,18 @@
         }
 
         @@media print {
+            html,
             body {
                 background: #fff;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
                 body.direct-print-mode .print-shell {
                     display: block !important;
                     position: static !important;
                     width: 210mm !important;
-                    height: 297mm !important;
+                    height: auto !important;
                     margin: 0 !important;
                     padding: 0 !important;
                     border: none !important;
@@ -960,6 +963,11 @@
                     padding: 0 !important;
                     max-width: none !important;
                     background: #fff !important;
+                }
+
+                body.direct-print-mode .page-wrap {
+                    margin: 0 !important;
+                    padding: 0 !important;
                 }
 
                 body.direct-print-mode .no-print {
@@ -1344,7 +1352,7 @@
                             <div class="field medium">
                                 <label>Chọn người ký Hội đồng</label>
                                 <select id="hoiDongSelect"></select>
-                                @*<small id="hoiDongBalanceHint" style="display:block; margin-top:6px; color:#6b7280; font-weight:600;"></small>*@
+                                <small id="hoiDongBalanceHint" class="adv-box" style="margin-top:6px; color:#6b7280; font-weight:600;"></small>
                             </div>
                             <div class="field medium adv-box">
                                 <label>Chọn người lập bảng (tuần hiện tại)</label>
