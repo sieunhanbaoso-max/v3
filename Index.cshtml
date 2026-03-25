@@ -559,7 +559,8 @@
 
         .print-area {
             width: 210mm;
-            height: 297mm;
+            min-height: auto;
+            height:auto;
             margin: 0;
             background: #fff;
             color: #000;
@@ -569,7 +570,7 @@
             padding-bottom: 0.432cm;
             padding-left: 2.997cm;
             box-sizing: border-box;
-            overflow: hidden;
+            overflow: visible;
             position: relative;
         }
 
@@ -1369,7 +1370,7 @@
                             <div class="field medium adv-box">
                                 <label>Chọn người lập bảng (tuần hiện tại)</label>
                                 <select id="nguoiLapBaseSelect"></select>
-                                <small id="nguoiLapHint" style="display:block; margin-top:6px; color:#6b7280; font-weight:600;"></small>
+                                <small id="nguoiLapHint"  style="display:block; margin-top:6px; color:#6b7280; font-weight:600;"></small>
                             </div>
 
                         </div>
@@ -1384,8 +1385,8 @@
 
                         <div class="print-actions">
                             <button type="button" class="success" id="btnPrint">In mẫu</button>
-                            <div id="printWarnBar" class="print-warn-bar" style="display:none;"></div>
-                            <div class="print-counter" id="printCounter">0</div>
+                           @* <div id="printWarnBar" class="print-warn-bar adv-box" style="display:none;"></div>*@
+                            <div class="print-counter adv-box" id="printCounter">0</div>
                         </div>
                     </div>
 
