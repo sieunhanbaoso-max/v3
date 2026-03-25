@@ -1,4 +1,4 @@
-﻿﻿@{
+﻿﻿﻿@{
     Layout = null;
     var today = DateTime.Today.ToString("yyyy-MM-dd");
 }
@@ -560,7 +560,7 @@
         .print-area {
             width: 210mm;
             min-height: auto;
-            height:auto;
+            height: auto;
             margin: 0;
             background: #fff;
             color: #000;
@@ -946,9 +946,9 @@
                     overflow: hidden !important;
                 }
 
-                body.direct-print-mode .print-shell * {
-                    visibility: visible !important;
-                }
+                    body.direct-print-mode .print-shell * {
+                        visibility: visible !important;
+                    }
 
                 body.direct-print-mode .print-area {
                     width: 210mm !important;
@@ -1307,6 +1307,84 @@
             padding: 7px 10px;
             cursor: pointer;
         }
+
+
+
+        .print-confirm-card {
+            width: min(520px, 100%);
+            padding: 20px;
+            border-radius: 22px;
+            border: 1px solid rgba(148, 163, 184, 0.20);
+            box-shadow: 0 24px 50px rgba(15, 23, 42, 0.24);
+        }
+
+        .print-confirm-body {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            margin-top: 8px;
+        }
+
+        .print-confirm-icon {
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f59e0b, #f97316);
+            color: #fff;
+            font-size: 24px;
+            font-weight: 800;
+            box-shadow: 0 10px 24px rgba(245, 158, 11, 0.28);
+        }
+
+        .print-confirm-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .print-confirm-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        .print-confirm-note {
+            margin-top: 8px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #6b7280;
+        }
+
+        .print-confirm-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+            .print-confirm-actions button {
+                min-width: 120px;
+                border-radius: 14px;
+                padding: 11px 16px;
+                font-weight: 700;
+                border: none;
+            }
+
+            .print-confirm-actions .btn-light {
+                background: #f3f4f6;
+                color: #374151;
+                border: 1px solid #d1d5db;
+            }
+
+            .print-confirm-actions .btn-continue {
+                background: linear-gradient(135deg, #f59e0b, #ea580c);
+                color: #fff;
+                box-shadow: 0 12px 24px rgba(234, 88, 12, 0.24);
+            }
     </style>
 </head>
 <body>
@@ -1323,7 +1401,7 @@
                                 <button type="button" id="btnNapDai">Nạp đài theo ngày</button>
                                 <button type="button" class="primary" id="btnLoad">Load dữ liệu</button>
 
-                                <label class="live-check">
+                                <label class="live-check a">
                                     <input type="checkbox" id="chkLiveMode" />
                                     <span>Live mode</span>
                                 </label>
@@ -1346,18 +1424,16 @@
                         <div class="left-menu-head">
                             <div class="left-menu-icon">📄</div>
                             <div>
-                                <p class="left-menu-title">Minh Ngọc Raw</p>
-                                <p class="left-menu-sub">Load HTML • Lịch Hội đồng • BLD • In mẫu</p>
+                                <p class="left-menu-title">Chức Năng Chính</p>
+                                <p class="left-menu-sub">Lấy kết quả từ trang Minh Ngọc • Lịch Hội đồng • Ban Lãnh Đạo • In Kết Quả</p>
                             </div>
                         </div>
 
                         <div class="left-menu-group">
                             <div class="left-menu-group-title">Tác vụ</div>
                             <div class="left-tools">
-                                <button type="button" id="btnNapDai">Nạp đài theo ngày</button>
-                                <button type="button" class="primary" id="btnLoad">Load dữ liệu</button>
 
-                                <label class="live-check">
+                                <label class=" adv-box @*live-check*@">
                                     <input type="checkbox" id="chkLiveMode" />
                                     <span>Live mode</span>
                                 </label>
@@ -1371,27 +1447,34 @@
                                     <input type="checkbox" id="chkAutoPrint" />
                                     <span>Tự in khi đủ kết quả (Auto)</span>
                                 </label>
+                                <button type="button" class="adv-box" id="btnNapDai">Nạp đài theo ngày</button>
+                                <button type="button" class="primary adv-box" id="btnLoad">Load dữ liệu</button>
 
+                                <button type="button" id="btnOpenUploadModal">Tải lịch Hội đồng/Ban Lãnh Đạo/</button>
                                 <button type="button" id="btnStartAuto">Chạy auto</button>
                                 <button type="button" id="btnStopAuto">Dừng auto</button>
-                                <button type="button" id="btnToday">Hôm nay</button>
-                                <button type="button" id="btnToggleAdvanced">Bật thêm</button>
+                                <button type="button" class="adv-box" id="btnToday">Hôm nay</button>
+                                <button type="button" class="adv-box" id="btnToggleAdvanced">Bật thêm</button>
+                                <button type="button" id="btnRollingMode" class="left-chip mode-btn adv-box">🏇 Đổi số chạy thành ngựa chạy</button>
+                                <button type="button" id="btnTheme" class="left-chip theme-btn adv-box">☀ Theme</button>
+                                <button type="button" class="adv-box" id="btnQuickGuide">Hướng dẫn nhanh</button>
+
+
                             </div>
                         </div>
 
-                        <div class="left-menu-footer">
-                            <button type="button" id="btnRollingMode" class="left-chip mode-btn">🏇 Đổi số chạy thành ngựa chạy</button>
-                            <button type="button" id="btnTheme" class="left-chip theme-btn">☀ Theme</button>
-                        </div>
+                        @*<div class="left-menu-group">
+
+                            </div>*@
                     </div>
                 </div>
 
 
                 <div class="right-content">
                     <div class="right-topbar-card">
-                        <h2 class="right-topbar-title">Load dữ liệu Minh Ngọc</h2>
+                        <h2 class="right-topbar-title">Công cụ làm kết quả loto</h2>
                         <div class="right-topbar-sub">
-                            Màn này chỉ để tải HTML/xem trước từ Minh Ngọc. Không lưu DB. Chọn đài nào thì sẽ đổ kết quả vào mẫu in ngay tại đây.
+                            Tiếp nhận dữ liệu • Chuẩn hóa kết quả • Cấp nguồn cho bảng in.
                         </div>
                     </div>
 
@@ -1419,7 +1502,7 @@
                             <div class="field medium adv-box">
                                 <label>Chọn người lập bảng (tuần hiện tại)</label>
                                 <select id="nguoiLapBaseSelect"></select>
-                                <small id="nguoiLapHint"  style="display:block; margin-top:6px; color:#6b7280; font-weight:600;"></small>
+                                <small id="nguoiLapHint" style="display:block; margin-top:6px; color:#6b7280; font-weight:600;"></small>
                             </div>
 
                         </div>
@@ -1433,8 +1516,8 @@
                         </div>
 
                         <div class="print-actions">
-                            <button type="button" class="success" id="btnPrint">In mẫu</button>
-                           @* <div id="printWarnBar" class="print-warn-bar adv-box" style="display:none;"></div>*@
+                            <button type="button" class="success" id="btnPrint">In Kết Quả</button>
+                            @* <div id="printWarnBar" class="print-warn-bar adv-box" style="display:none;"></div>*@
                             <div class="print-counter adv-box" id="printCounter">0</div>
                         </div>
                     </div>
@@ -1450,9 +1533,9 @@
                             <textarea id="banLanhDaoBox" readonly style="min-height:80px;"></textarea>
                         </div>
 
-                        <div class="box">
-                            <button type="button" id="btnOpenUploadModal">Mở form tải file Hội đồng / BLD</button>
-                        </div>
+                        @*<div class="box">
+                                <button type="button" id="btnOpenUploadModal">Mở form tải file Hội đồng / BLD</button>
+                            </div>*@
                     </div>
 
                     <div class="print-shell">
@@ -1478,7 +1561,7 @@
 
                             <div class="title">KẾT QUẢ XỔ SỐ TỰ CHỌN</div>
                             <div class="date-line" id="printDateLine">Ngày -- tháng -- năm ----</div>
-                           
+
 
                             <table class="result-table">
                                 <colgroup>
@@ -1595,6 +1678,41 @@
             </div>
 
             <div class="box" style="margin-top:0;">
+                <label>Tải Lịch Hội Đồng co dinh dang (.docx)</label>
+                <div class="actions" style="align-items:center;">
+                    <input type="file" id="liclFile" accept=".docx" />
+                    <button type="button" id="btnUploadLicl">Tải file lên</button>
+                    <input type="text" id="liclFileName" readonly style="min-width:320px;" placeholder="Chưa có file upload" />
+                </div>
+            </div>
+
+            <div class="box">
+                <label>Tải Lịch Ban lãnh đạo dinh dang (.docx)</label>
+                <div class="actions" style="align-items:center;">
+                    <input type="file" id="bldFile" accept=".docx" />
+                    <button type="button" id="btnUploadBld">Tải file BLD lên</button>
+                    <input type="text" id="bldFileName" readonly style="min-width:320px;" placeholder="Chưa có file upload" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+    @*</div>*@
+
+    <div id="uploadModal" class="modal-backdrop" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3 class="modal-title">Tải file Hội đồng / Ban lãnh đạo</h3>
+                <button type="button" class="modal-close" id="btnCloseUploadModal">Đóng</button>
+            </div>
+
+            <div class="box" style="margin-top:0;">
                 <label>File LICL.docx</label>
                 <div class="actions" style="align-items:center;">
                     <input type="file" id="liclFile" accept=".docx" />
@@ -1613,6 +1731,57 @@
             </div>
         </div>
     </div>
+
+    <div id="quickGuideModal" class="modal-backdrop" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3 class="modal-title">Hướng dẫn nhanh</h3>
+                <button type="button" class="modal-close" id="btnCloseQuickGuide">Đóng</button>
+            </div>
+            <ol class="quick-guide-list">
+                <li>Văn Thư bấm nút tải lịch Hội đồng, Ban lãnh đạo để tải lịch Ban lãnh đạo hàng tuần.</li>
+                <li>Bộ phận sếp lịch hội đồng bấm nút tải lịch Hội đồng, Ban lãnh đạo để tải lịch Hội đồng khi có lịch mới.</li>
+                <li>Đã tự động xoay tua theo tuần đúng với hiện tại (Tạ -&gt; Trung -&gt; Liên -&gt; Hoa), hàng tuần tự động điền tên người lập theo tua này.</li>
+                <li>Người ký Hội đồng tự động phân tên để mỗi người đều có số lượng ký đều nhau.</li>
+                <li>Hàng ngày trong giờ xổ trực tiếp ở trang Minh Ngọc thì mấm nút chạy auto để tự động lấy cho đến khi xổ hết; nếu check tự in thì khi lấy xong sẽ hiện cửa sổ in luôn, chỉ cần bấm OK là in.</li>
+                <li>Ngoài giờ xổ, khi bấm ngày khác thì sẽ tự động lấy mọi thứ để có trang in và đổ vào bảng kết quả.</li>
+            </ol>
+        </div>
+    </div>
+
+
+
+
+
+    <div id="printConfirmModal" class="modal-backdrop" aria-hidden="true">
+        <div class="modal-card print-confirm-card" role="dialog" aria-modal="true" aria-labelledby="printConfirmTitle">
+            <div class="modal-head">
+                <h3 class="modal-title" id="printConfirmTitle">Xác nhận tiếp tục in</h3>
+                <button type="button" class="modal-close" id="btnClosePrintConfirm">Đóng</button>
+            </div>
+
+            <div class="print-confirm-body">
+                <div class="print-confirm-icon">!</div>
+                <div class="print-confirm-content">
+                    <div class="print-confirm-text" id="printConfirmMessage">
+                        Chưa đủ tên người ký. Bạn có muốn tiếp tục in không?
+                    </div>
+                    <div class="print-confirm-note">
+                        Nếu tiếp tục, hệ thống vẫn mở cửa sổ in với dữ liệu hiện tại.
+                    </div>
+                </div>
+            </div>
+
+            <div class="print-confirm-actions">
+                <button type="button" class="btn-light" id="btnCancelPrintConfirm">Hủy</button>
+                <button type="button" class="btn-continue" id="btnContinuePrintConfirm">Tiếp tục in</button>
+            </div>
+        </div>
+    </div>
+
+
+
+
 
     <script>
         var currentParsedRecord = null;
@@ -3925,20 +4094,33 @@
             updateNguoiLapByDate();
         });
 
-        document.getElementById('btnPrint').addEventListener('click', function () {
-            var hoiDongText = ((document.getElementById('signHoiDongName') || {}).textContent || '').replace(/\u00A0/g, ' ').trim();
-            var bldText = ((document.getElementById('signBanLanhDaoName') || {}).textContent || '').replace(/\u00A0/g, ' ').trim();
+        //document.getElementById('btnPrint').addEventListener('click', function () {
+        //    var hoiDongText = ((document.getElementById('signHoiDongName') || {}).textContent || '').replace(/\u00A0/g, ' ').trim();
+        //    var bldText = ((document.getElementById('signBanLanhDaoName') || {}).textContent || '').replace(/\u00A0/g, ' ').trim();
 
-            if (!hoiDongText || !bldText) {
-                updatePrintWarnBar();
-                setStatus('warn', 'Chưa đủ tên Hội đồng hoặc Ban lãnh đạo để in.');
-                toastMsg('warn', 'Chưa đủ tên Hội đồng hoặc Ban lãnh đạo để in.');
-                return;
-            }
+        //    var missing = [];
+        //    if (!hoiDongText) missing.push('Hội đồng');
+        //    if (!bldText) missing.push('Ban lãnh đạo');
 
-            printOnlyResultArea();
+        //    if (missing.length > 0) {
+        //        updatePrintWarnBar();
 
-        });
+        //        var ok = confirm(
+        //            'Chưa đủ tên ' + missing.join(' và ') + '.\n\nBạn có muốn tiếp tục in không?'
+        //        );
+
+        //        if (!ok) {
+        //            setStatus('warn', 'Đã hủy in vì chưa đủ tên ' + missing.join(' và ') + '.');
+        //            toastMsg('warn', 'Đã hủy in.');
+        //            return;
+        //        }
+
+        //        setStatus('warn', 'Đang in dù chưa đủ tên ' + missing.join(' và ') + '.');
+        //    }
+
+        //    printOnlyResultArea();
+
+        //});
 
         document.getElementById('btnToggleAdvanced').addEventListener('click', function () {
             toggleAdvanced();
@@ -4023,6 +4205,8 @@
             await loadBldByDate();
             updatePrintWarnBar();
             startPrintCounter();
+            openModalById('quickGuideModal');
+
         });
 
 //        function printOnlyResultArea() {
@@ -4193,6 +4377,140 @@
 
             return validDais.indexOf(currentValue) >= 0;
         }
+
+
+
+
+
+        function openModalById(id) {
+            var modal = document.getElementById(id);
+            if (!modal) return;
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeModalById(id) {
+            var modal = document.getElementById(id);
+            if (!modal) return;
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+
+
+
+
+
+        document.getElementById('btnQuickGuide').addEventListener('click', function () {
+            openModalById('quickGuideModal');
+        });
+
+        document.getElementById('btnCloseQuickGuide').addEventListener('click', function () {
+            closeModalById('quickGuideModal');
+        });
+
+
+        var printConfirmResolver = null;
+
+        function openPrintConfirmModal(missingList) {
+            var modal = document.getElementById('printConfirmModal');
+            var msg = document.getElementById('printConfirmMessage');
+
+            if (!modal || !msg) {
+                return Promise.resolve(false);
+            }
+
+            var text = 'Chưa đủ tên ' + missingList.join(' và ') + '. Bạn có muốn tiếp tục in không?';
+            msg.textContent = text;
+
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+
+            return new Promise(function (resolve) {
+                printConfirmResolver = resolve;
+            });
+        }
+
+        function closePrintConfirmModal(result) {
+            var modal = document.getElementById('printConfirmModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+            }
+
+            if (printConfirmResolver) {
+                var resolver = printConfirmResolver;
+                printConfirmResolver = null;
+                resolver(!!result);
+            }
+        }
+
+        (function bindPrintConfirmModal() {
+            var btnClose = document.getElementById('btnClosePrintConfirm');
+            var btnCancel = document.getElementById('btnCancelPrintConfirm');
+            var btnContinue = document.getElementById('btnContinuePrintConfirm');
+            var modal = document.getElementById('printConfirmModal');
+
+            if (btnClose) {
+                btnClose.addEventListener('click', function () {
+                    closePrintConfirmModal(false);
+                });
+            }
+
+            if (btnCancel) {
+                btnCancel.addEventListener('click', function () {
+                    closePrintConfirmModal(false);
+                });
+            }
+
+            if (btnContinue) {
+                btnContinue.addEventListener('click', function () {
+                    closePrintConfirmModal(true);
+                });
+            }
+
+            if (modal) {
+                modal.addEventListener('click', function (e) {
+                    if (e.target === modal) {
+                        closePrintConfirmModal(false);
+                    }
+                });
+            }
+
+            window.addEventListener('keydown', function (e) {
+                var isOpen = modal && modal.style.display === 'flex';
+                if (isOpen && e.key === 'Escape') {
+                    closePrintConfirmModal(false);
+                }
+            });
+        })();
+
+        document.getElementById('btnPrint').addEventListener('click', async function () {
+            var hoiDongText = ((document.getElementById('signHoiDongName') || {}).textContent || '').replace(/\u00A0/g, ' ').trim();
+            var bldText = ((document.getElementById('signBanLanhDaoName') || {}).textContent || '').replace(/\u00A0/g, ' ').trim();
+
+            var missing = [];
+            if (!hoiDongText) missing.push('Hội đồng');
+            if (!bldText) missing.push('Ban lãnh đạo');
+
+            if (missing.length > 0) {
+                updatePrintWarnBar();
+
+                var ok = await openPrintConfirmModal(missing);
+
+                if (!ok) {
+                    setStatus('warn', 'Đã hủy in vì chưa đủ tên ' + missing.join(' và ') + '.');
+                    toastMsg('warn', 'Đã hủy in.');
+                    return;
+                }
+
+                setStatus('warn', 'Đang in dù chưa đủ tên ' + missing.join(' và ') + '.');
+            }
+
+            printOnlyResultArea();
+        });
+
+
 
     </script>
 </body>
