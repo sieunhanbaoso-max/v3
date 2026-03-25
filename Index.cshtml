@@ -916,15 +916,25 @@
         }
 
         @@media print {
+            html,
             body {
                 background: #fff;
+                margin: 0 !important;
+                padding: 0 !important;
             }
 
+                body.direct-print-mode * {
+                    visibility: hidden !important;
+                }
+
                 body.direct-print-mode .print-shell {
+                    visibility: visible !important;
                     display: block !important;
-                    position: static !important;
+                    position: fixed !important;
+                    left: 0 !important;
+                    top: 0 !important;
                     width: 210mm !important;
-                    height: 297mm !important;
+                    height: 296mm !important;
                     margin: 0 !important;
                     padding: 0 !important;
                     border: none !important;
@@ -935,10 +945,15 @@
                     overflow: hidden !important;
                 }
 
+                body.direct-print-mode .print-shell * {
+                    visibility: visible !important;
+                }
+
                 body.direct-print-mode .print-area {
                     width: 210mm !important;
-                    height: 297mm !important;
-                    min-height: 297mm !important;
+                    height: 296mm !important;
+                    min-height: 0 !important;
+                    padding-bottom: 0 !important;
                     margin: 0 !important;
                     box-sizing: border-box !important;
                     overflow: hidden !important;
@@ -960,6 +975,11 @@
                     padding: 0 !important;
                     max-width: none !important;
                     background: #fff !important;
+                }
+
+                body.direct-print-mode .page-wrap {
+                    margin: 0 !important;
+                    padding: 0 !important;
                 }
 
                 body.direct-print-mode .no-print {
@@ -1237,6 +1257,56 @@
             letter-spacing: 1.2px;
             text-shadow: 0 1px 0 #fff, 0 0 8px rgba(236, 72, 153, 0.4);
         }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 16px;
+        }
+
+        .modal-card {
+            width: min(760px, 100%);
+            max-height: calc(100vh - 32px);
+            overflow: auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.35);
+            border: 1px solid #d8d8d8;
+            padding: 16px;
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            border: 1px solid #d1d5db;
+            background: #fff;
+            border-radius: 10px;
+            padding: 7px 10px;
+            cursor: pointer;
+        }
+
+        .quick-guide-list {
+            margin: 0;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -1306,6 +1376,7 @@
                                 <button type="button" id="btnStopAuto">Dừng auto</button>
                                 <button type="button" id="btnToday">Hôm nay</button>
                                 <button type="button" id="btnToggleAdvanced">Bật thêm</button>
+                                <button type="button" id="btnQuickGuide">Hướng dẫn nhanh</button>
                             </div>
                         </div>
 
@@ -1344,7 +1415,7 @@
                             <div class="field medium">
                                 <label>Chọn người ký Hội đồng</label>
                                 <select id="hoiDongSelect"></select>
-                                @*<small id="hoiDongBalanceHint" style="display:block; margin-top:6px; color:#6b7280; font-weight:600;"></small>*@
+                                <small id="hoiDongBalanceHint" class="adv-box" style="margin-top:6px; color:#6b7280; font-weight:600;"></small>
                             </div>
                             <div class="field medium adv-box">
                                 <label>Chọn người lập bảng (tuần hiện tại)</label>
@@ -1370,32 +1441,18 @@
                     </div>
 
                     <div class="right-advanced-card adv-box">
-                        <div class="box" style="margin-top:0;">
-                            <label>File LICL.docx</label>
-                            <div class="actions" style="align-items:center;">
-                                <input type="file" id="liclFile" accept=".docx" />
-                                <button type="button" id="btnUploadLicl">Tải file lên</button>
-                                <input type="text" id="liclFileName" readonly style="min-width:320px;" placeholder="Chưa có file upload" />
-                            </div>
-                        </div>
-
                         <div class="box">
                             <label>Hội đồng đọc từ file</label>
                             <textarea id="hoiDongBox" readonly style="min-height:80px;"></textarea>
                         </div>
 
                         <div class="box">
-                            <label>File Ban lãnh đạo (.docx)</label>
-                            <div class="actions" style="align-items:center;">
-                                <input type="file" id="bldFile" accept=".docx" />
-                                <button type="button" id="btnUploadBld">Tải file BLD lên</button>
-                                <input type="text" id="bldFileName" readonly style="min-width:320px;" placeholder="Chưa có file upload" />
-                            </div>
+                            <label>Ban lãnh đạo đọc từ file</label>
+                            <textarea id="banLanhDaoBox" readonly style="min-height:80px;"></textarea>
                         </div>
 
                         <div class="box">
-                            <label>Ban lãnh đạo đọc từ file</label>
-                            <textarea id="banLanhDaoBox" readonly style="min-height:80px;"></textarea>
+                            <button type="button" id="btnOpenUploadModal">Mở form tải file Hội đồng / BLD</button>
                         </div>
                     </div>
 
@@ -1528,6 +1585,50 @@
                 <label>Xem render HTML</label>
                 <iframe id="previewFrame"></iframe>
             </div>
+        </div>
+    </div>
+
+    <div id="uploadModal" class="modal-backdrop" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3 class="modal-title">Tải file Hội đồng / Ban lãnh đạo</h3>
+                <button type="button" class="modal-close" id="btnCloseUploadModal">Đóng</button>
+            </div>
+
+            <div class="box" style="margin-top:0;">
+                <label>File LICL.docx</label>
+                <div class="actions" style="align-items:center;">
+                    <input type="file" id="liclFile" accept=".docx" />
+                    <button type="button" id="btnUploadLicl">Tải file lên</button>
+                    <input type="text" id="liclFileName" readonly style="min-width:320px;" placeholder="Chưa có file upload" />
+                </div>
+            </div>
+
+            <div class="box">
+                <label>File Ban lãnh đạo (.docx)</label>
+                <div class="actions" style="align-items:center;">
+                    <input type="file" id="bldFile" accept=".docx" />
+                    <button type="button" id="btnUploadBld">Tải file BLD lên</button>
+                    <input type="text" id="bldFileName" readonly style="min-width:320px;" placeholder="Chưa có file upload" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="quickGuideModal" class="modal-backdrop" aria-hidden="true">
+        <div class="modal-card">
+            <div class="modal-head">
+                <h3 class="modal-title">Hướng dẫn nhanh</h3>
+                <button type="button" class="modal-close" id="btnCloseQuickGuide">Đóng</button>
+            </div>
+            <ol class="quick-guide-list">
+                <li>Văn Thư bấm nút tải lịch Hội đồng, Ban lãnh đạo để tải lịch Ban lãnh đạo hàng tuần.</li>
+                <li>Trung tải lịch Hội đồng khi có lịch mới.</li>
+                <li>Đã tự động xoay tua theo tuần đúng với hiện tại (Tạ -&gt; Trung -&gt; Liên -&gt; Hoa), hàng tuần tự động điền tên người lập theo tua này.</li>
+                <li>Người ký Hội đồng tự động phân tên để mỗi người đều có số lượng ký đều nhau.</li>
+                <li>Hàng ngày trong giờ xổ trực tiếp ở trang Minh Ngọc thì bật auto tool để tự động lấy cho đến khi xổ hết; bật tự in thì khi lấy xong sẽ hiện cửa sổ in luôn, chỉ cần bấm OK là in.</li>
+                <li>Ngoài giờ xổ, khi bấm ngày khác thì sẽ tự động lấy mọi thứ để có trang in và đổ vào bảng kết quả.</li>
+            </ol>
         </div>
     </div>
 
@@ -2680,6 +2781,13 @@
             }
         }
 
+        function closeUploadModal() {
+            var modal = document.getElementById('uploadModal');
+            if (!modal) return;
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
         async function uploadLiclDocx() {
             var fileInput = document.getElementById('liclFile');
             if (!fileInput.files || !fileInput.files.length) {
@@ -2708,6 +2816,7 @@
                 setValueIfExists('liclFileName', rs.fileName || '');
                 toastMsg('ok', rs.message || 'Tải file LICL thành công.');
                 await loadLiclByDate();
+                closeUploadModal();
             } catch (e) {
                 setStatus('err', 'Lỗi upload file: ' + e.message);
             }
@@ -2741,6 +2850,7 @@
                 setValueIfExists('bldFileName', rs.fileName || '');
                 toastMsg('ok', rs.message || 'Tải file BLD thành công.');
                 await loadBldByDate();
+                closeUploadModal();
             } catch (e) {
                 setStatus('err', 'Lỗi upload file BLD: ' + e.message);
             }
@@ -3791,6 +3901,12 @@
             await napDaiTheoNgay(false);
             await loadLiclByDate();
             await loadBldByDate();
+
+            var ngay = (document.getElementById('ngay') || {}).value || '';
+            var dai = (document.getElementById('dai') || {}).value || '';
+            if (ngay && dai) {
+                await loadData(false);
+            }
         });
 
         document.getElementById('nguoiLapBaseSelect').addEventListener('change', async function () {
@@ -3846,6 +3962,58 @@
             toggleAdvanced();
         });
 
+        function openModalById(id) {
+            var modal = document.getElementById(id);
+            if (!modal) return;
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeModalById(id) {
+            var modal = document.getElementById(id);
+            if (!modal) return;
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        document.getElementById('btnOpenUploadModal').addEventListener('click', function () {
+            openModalById('uploadModal');
+        });
+
+        document.getElementById('btnCloseUploadModal').addEventListener('click', function () {
+            closeModalById('uploadModal');
+        });
+
+        document.getElementById('btnQuickGuide').addEventListener('click', function () {
+            openModalById('quickGuideModal');
+        });
+
+        document.getElementById('btnCloseQuickGuide').addEventListener('click', function () {
+            closeModalById('quickGuideModal');
+        });
+
+        document.getElementById('uploadModal').addEventListener('click', function (e) {
+            if (e.target !== this) return;
+            closeModalById('uploadModal');
+        });
+
+        document.getElementById('quickGuideModal').addEventListener('click', function (e) {
+            if (e.target !== this) return;
+            closeModalById('quickGuideModal');
+        });
+
+        window.addEventListener('keydown', function (e) {
+            if (e.key !== 'Escape') return;
+            var uploadModal = document.getElementById('uploadModal');
+            if (uploadModal && uploadModal.style.display === 'flex') {
+                closeModalById('uploadModal');
+            }
+            var quickGuideModal = document.getElementById('quickGuideModal');
+            if (quickGuideModal && quickGuideModal.style.display === 'flex') {
+                closeModalById('quickGuideModal');
+            }
+        });
+
         document.getElementById('btnUploadLicl').addEventListener('click', async function () {
             await uploadLiclDocx();
         });
@@ -3897,6 +4065,7 @@
             await loadBldByDate();
             updatePrintWarnBar();
             startPrintCounter();
+            openModalById('quickGuideModal');
         });
 
 //        function printOnlyResultArea() {
