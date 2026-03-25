@@ -559,7 +559,8 @@
 
         .print-area {
             width: 210mm;
-            height: 297mm;
+            min-height: auto;
+            height:auto;
             margin: 0;
             background: #fff;
             color: #000;
@@ -569,7 +570,7 @@
             padding-bottom: 0.432cm;
             padding-left: 2.997cm;
             box-sizing: border-box;
-            overflow: hidden;
+            overflow: visible;
             position: relative;
         }
 
@@ -916,11 +917,8 @@
         }
 
         @@media print {
-            html,
             body {
                 background: #fff;
-                margin: 0 !important;
-                padding: 0 !important;
             }
 
                 body.direct-print-mode .print-shell {
@@ -935,16 +933,16 @@
                     border-radius: 0 !important;
                     backdrop-filter: none !important;
                     background: #fff !important;
-                    overflow: hidden !important;
+                    overflow: visible !important;
                 }
 
                 body.direct-print-mode .print-area {
                     width: 210mm !important;
-                    height: 297mm !important;
-                    min-height: 297mm !important;
+                    height: auto !important;
+                    min-height: auto !important;
                     margin: 0 !important;
                     box-sizing: border-box !important;
-                    overflow: hidden !important;
+                    overflow: visible !important;
                 }
 
                 body.direct-print-mode .left-menu,
@@ -963,11 +961,6 @@
                     padding: 0 !important;
                     max-width: none !important;
                     background: #fff !important;
-                }
-
-                body.direct-print-mode .page-wrap {
-                    margin: 0 !important;
-                    padding: 0 !important;
                 }
 
                 body.direct-print-mode .no-print {
@@ -1352,12 +1345,12 @@
                             <div class="field medium">
                                 <label>Chọn người ký Hội đồng</label>
                                 <select id="hoiDongSelect"></select>
-                                <small id="hoiDongBalanceHint" class="adv-box" style="margin-top:6px; color:#6b7280; font-weight:600;"></small>
+                                <small id="hoiDongBalanceHint" class="adv-box" style="display:none; margin-top:6px; color:#6b7280; font-weight:600;"></small>
                             </div>
                             <div class="field medium adv-box">
                                 <label>Chọn người lập bảng (tuần hiện tại)</label>
                                 <select id="nguoiLapBaseSelect"></select>
-                                <small id="nguoiLapHint" style="display:block; margin-top:6px; color:#6b7280; font-weight:600;"></small>
+                                <small id="nguoiLapHint"  style="display:block; margin-top:6px; color:#6b7280; font-weight:600;"></small>
                             </div>
 
                         </div>
@@ -1372,8 +1365,8 @@
 
                         <div class="print-actions">
                             <button type="button" class="success" id="btnPrint">In mẫu</button>
-                            <div id="printWarnBar" class="print-warn-bar" style="display:none;"></div>
-                            <div class="print-counter" id="printCounter">0</div>
+                           @* <div id="printWarnBar" class="print-warn-bar adv-box" style="display:none;"></div>*@
+                            <div class="print-counter adv-box" id="printCounter">0</div>
                         </div>
                     </div>
 
