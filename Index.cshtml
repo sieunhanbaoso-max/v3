@@ -1,4 +1,4 @@
-﻿﻿﻿@{
+﻿﻿﻿﻿@{
     Layout = null;
     var today = DateTime.Today.ToString("yyyy-MM-dd");
 }
@@ -7,7 +7,7 @@
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
-    <title>Load dữ liệu Minh Ngọc</title>
+    <title>SIÊU NHÂN PRO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
@@ -1450,7 +1450,7 @@
                                 <button type="button" class="adv-box" id="btnNapDai">Nạp đài theo ngày</button>
                                 <button type="button" class="primary adv-box" id="btnLoad">Load dữ liệu</button>
 
-                                <button type="button" id="btnOpenUploadModal">Tải lịch Hội đồng/Ban Lãnh Đạo/</button>
+                                <button type="button" id="btnOpenUploadModal">Tải lịch Hội đồng/Ban Lãnh Đạo</button>
                                 <button type="button" id="btnStartAuto">Chạy auto</button>
                                 <button type="button" id="btnStopAuto">Dừng auto</button>
                                 <button type="button" class="adv-box" id="btnToday">Hôm nay</button>
@@ -1458,6 +1458,8 @@
                                 <button type="button" id="btnRollingMode" class="left-chip mode-btn adv-box">🏇 Đổi số chạy thành ngựa chạy</button>
                                 <button type="button" id="btnTheme" class="left-chip theme-btn adv-box">☀ Theme</button>
                                 <button type="button" class="adv-box" id="btnQuickGuide">Hướng dẫn nhanh</button>
+                                <button type="button" id="btnOpenBldPicker">Chọn tên ký BLD</button>
+                                <button type="button" id="btnOpenNguoiLapPicker" style="margin-top:8px;">Chọn người lập ký</button>
 
 
                             </div>
@@ -1584,7 +1586,7 @@
                                 <tbody id="printBody">
                                     <tr>
                                         <td colspan="2">
-                                            <div class="print-empty">Chưa có dữ liệu. Anh chọn ngày, chọn đài rồi bấm Load dữ liệu.</div>
+                                            <div class="print-empty">Chưa có dữ liệu. Vui lòng chọn ngày, chọn đài rồi bấm Load dữ liệu.</div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -2703,7 +2705,7 @@
             setTextIfExists('printDaiHeader', 'Đài');
             setTextIfExists('printDateLine', 'Ngày -- tháng -- năm ----');
             document.getElementById('printBody').innerHTML =
-                '<tr><td colspan="2"><div class="print-empty">Chưa có dữ liệu. Anh chọn ngày, chọn đài rồi bấm Load dữ liệu.</div></td></tr>';
+                '<tr><td colspan="2"><div class="print-empty">Chưa có dữ liệu của ngày hôm nay.</div></td></tr>';
         }
 
         function splitVals(s) {
