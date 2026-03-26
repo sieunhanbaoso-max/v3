@@ -2619,6 +2619,7 @@
 
             setValueIfExists('banLanhDaoBox', '');
             setTextIfExists('signBanLanhDaoName', '');
+            currentBldList = [];
             hidePrintWarnBar();
 
         }
@@ -2905,9 +2906,19 @@
             updatePrintWarnBar();
         }
 
+        function isFutureDateIso(isoDate) {
+            if (!isoDate) return false;
+            return isoDate > getTodayIso();
+        }
+
         async function loadLiclByDate() {
             var ngay = document.getElementById('ngay').value;
             if (!ngay) return;
+            if (isFutureDateIso(ngay)) {
+                clearLiclDisplay();
+                setStatus('warn', 'Ngày đã chọn lớn hơn ngày hiện tại, chưa có dữ liệu Hội đồng.');
+                return false;
+            }
 
             try {
                 var url = '@Url.Action("GetLiclByDate", "MinhNgocRaw")' + '?date=' + encodeURIComponent(ngay);
@@ -2923,17 +2934,18 @@
                     setValueIfExists('liclFileName', rs.fileName);
                 }
 
+                if (!rs.ok) {
+                    clearLiclDisplay();
+                    toastMsg('warn', rs.message || 'Không load được Hội đồng.');
+                    return false;
+                }
+
                 var hoiDongArr = normalizeHoiDongArray(rs.hoiDong || []);
                 var banLanhDaoArr = rs.banLanhDao || [];
 
                 setValueIfExists('hoiDongBox', hoiDongArr.join('\n'));
                 fillSignNamesFromLicl(hoiDongArr, banLanhDaoArr);
                 updatePrintWarnBar();
-
-                if (!rs.ok) {
-                    toastMsg('warn', rs.message || 'Không load được Hội đồng.');
-                    return false;
-                }
 
                 // Có thể backend trả ok nhưng file chưa có dòng tên hợp lệ.
                 // Trường hợp này chỉ cảnh báo nhẹ trên status để UI đỡ "giật" toast.
@@ -2952,6 +2964,11 @@
         async function loadBldByDate() {
             var ngay = document.getElementById('ngay').value;
             if (!ngay) return;
+            if (isFutureDateIso(ngay)) {
+                clearBldDisplay();
+                setStatus('warn', 'Ngày đã chọn lớn hơn ngày hiện tại, chưa có dữ liệu Ban lãnh đạo.');
+                return;
+            }
 
             try {
                 var url = '@Url.Action("GetBldByDate", "MinhNgocRaw")' + '?date=' + encodeURIComponent(ngay);
@@ -2967,12 +2984,19 @@
                     setValueIfExists('bldFileName', rs.fileName);
                 }
 
+                if (!rs.ok) {
+                    clearBldDisplay();
+                    toastMsg('warn', rs.message || 'Không load được Ban lãnh đạo.');
+                    return;
+                }
+
                 var tenBld = normalizeBldName(rs.tenLanhDao || '');
                 currentBldList = tenBld ? [tenBld] : [];
                 setValueIfExists('banLanhDaoBox', tenBld);
                 setTextIfExists('signBanLanhDaoName', tenBld || '');
                 updatePrintWarnBar();
-                if (!rs.ok || !tenBld) {
+                if (!tenBld) {
+                    clearBldDisplay();
                     toastMsg('warn', rs.message || 'Không load được Ban lãnh đạo.');
                 }
             } catch (e) {
