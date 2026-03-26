@@ -1499,10 +1499,17 @@
                                 <select id="hoiDongSelect"></select>
                                 <small id="hoiDongBalanceHint" class="adv-box" style="margin-top:6px; color:#6b7280; font-weight:600;"></small>
                             </div>
+                            <div class="field medium">
+                                <label>Người ký Ban lãnh đạo</label>
+                                <button type="button" id="btnOpenBldPicker">Chọn tên ký BLD</button>
+                                <small style="display:block; margin-top:6px; color:#6b7280;">Không đổi lịch hiện tại, chỉ thay tên ký khi cần.</small>
+                            </div>
                             <div class="field medium adv-box">
                                 <label>Chọn người lập bảng (tuần hiện tại)</label>
                                 <select id="nguoiLapBaseSelect"></select>
                                 <small id="nguoiLapHint" style="display:block; margin-top:6px; color:#6b7280; font-weight:600;"></small>
+                                <button type="button" id="btnOpenNguoiLapPicker" style="margin-top:8px;">Chọn người lập ký</button>
+                                <small style="display:block; margin-top:6px; color:#6b7280;">Không đổi lịch tua, chỉ thay tên người lập khi cần.</small>
                             </div>
 
                         </div>
@@ -1732,6 +1739,46 @@
         </div>
     </div>
 
+    <div id="bldPickerModal" class="modal-backdrop" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="bldPickerTitle">
+            <div class="modal-head">
+                <h3 class="modal-title" id="bldPickerTitle">Chọn người ký Ban lãnh đạo</h3>
+                <button type="button" class="modal-close" id="btnCloseBldPicker">Đóng</button>
+            </div>
+            <div class="box" style="margin-top:0;">
+                <label>Danh sách tên từ lịch BLD</label>
+                <select id="bldPickerSelect"></select>
+            </div>
+            <div class="box">
+                <label>Hoặc nhập tên thủ công (nếu cần thay tạm)</label>
+                <input type="text" id="bldManualName" placeholder="Ví dụ: Nguyễn Văn A" />
+            </div>
+            <div class="actions" style="justify-content:flex-end; margin-top:12px;">
+                <button type="button" id="btnApplyBldPicker" class="success">Áp dụng tên ký BLD</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="nguoiLapPickerModal" class="modal-backdrop" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="nguoiLapPickerTitle">
+            <div class="modal-head">
+                <h3 class="modal-title" id="nguoiLapPickerTitle">Chọn người lập ký</h3>
+                <button type="button" class="modal-close" id="btnCloseNguoiLapPicker">Đóng</button>
+            </div>
+            <div class="box" style="margin-top:0;">
+                <label>Danh sách người lập</label>
+                <select id="nguoiLapPickerSelect"></select>
+            </div>
+            <div class="box">
+                <label>Hoặc nhập tên thủ công</label>
+                <input type="text" id="nguoiLapManualName" placeholder="Ví dụ: Người 1" />
+            </div>
+            <div class="actions" style="justify-content:flex-end; margin-top:12px;">
+                <button type="button" id="btnApplyNguoiLapPicker" class="success">Áp dụng người lập ký</button>
+            </div>
+        </div>
+    </div>
+
     <div id="quickGuideModal" class="modal-backdrop" aria-hidden="true">
         <div class="modal-card">
             <div class="modal-head">
@@ -1804,6 +1851,7 @@
         var NGUOI_LAP_STATE_KEY = 'minhngoc_nguoi_lap_weekly_state_v1';
         var nguoiLapStateVersion = 0;
         var currentHoiDongList = [];
+        var currentBldList = [];
 
         function getTodayIso() {
             var now = new Date();
@@ -2571,6 +2619,7 @@
 
             setValueIfExists('banLanhDaoBox', '');
             setTextIfExists('signBanLanhDaoName', '');
+            currentBldList = [];
             hidePrintWarnBar();
 
         }
@@ -2848,6 +2897,7 @@
             renderHoiDongSelect(hoiDong || []);
 
             var bldArr = normalizeBldArray(banLanhDao || []);
+            currentBldList = bldArr.slice();
             var banLanhDaoText = bldArr.length ? bldArr.join(', ') : '';
             if (banLanhDaoText) {
                 setTextIfExists('signBanLanhDaoName', banLanhDaoText);
@@ -2856,9 +2906,19 @@
             updatePrintWarnBar();
         }
 
+        function isFutureDateIso(isoDate) {
+            if (!isoDate) return false;
+            return isoDate > getTodayIso();
+        }
+
         async function loadLiclByDate() {
             var ngay = document.getElementById('ngay').value;
             if (!ngay) return;
+            if (isFutureDateIso(ngay)) {
+                clearLiclDisplay();
+                setStatus('warn', 'Ngày đã chọn lớn hơn ngày hiện tại, chưa có dữ liệu Hội đồng.');
+                return false;
+            }
 
             try {
                 var url = '@Url.Action("GetLiclByDate", "MinhNgocRaw")' + '?date=' + encodeURIComponent(ngay);
@@ -2874,17 +2934,18 @@
                     setValueIfExists('liclFileName', rs.fileName);
                 }
 
+                if (!rs.ok) {
+                    clearLiclDisplay();
+                    toastMsg('warn', rs.message || 'Không load được Hội đồng.');
+                    return false;
+                }
+
                 var hoiDongArr = normalizeHoiDongArray(rs.hoiDong || []);
                 var banLanhDaoArr = rs.banLanhDao || [];
 
                 setValueIfExists('hoiDongBox', hoiDongArr.join('\n'));
                 fillSignNamesFromLicl(hoiDongArr, banLanhDaoArr);
                 updatePrintWarnBar();
-
-                if (!rs.ok) {
-                    toastMsg('warn', rs.message || 'Không load được Hội đồng.');
-                    return false;
-                }
 
                 // Có thể backend trả ok nhưng file chưa có dòng tên hợp lệ.
                 // Trường hợp này chỉ cảnh báo nhẹ trên status để UI đỡ "giật" toast.
@@ -2903,6 +2964,11 @@
         async function loadBldByDate() {
             var ngay = document.getElementById('ngay').value;
             if (!ngay) return;
+            if (isFutureDateIso(ngay)) {
+                clearBldDisplay();
+                setStatus('warn', 'Ngày đã chọn lớn hơn ngày hiện tại, chưa có dữ liệu Ban lãnh đạo.');
+                return;
+            }
 
             try {
                 var url = '@Url.Action("GetBldByDate", "MinhNgocRaw")' + '?date=' + encodeURIComponent(ngay);
@@ -2918,11 +2984,19 @@
                     setValueIfExists('bldFileName', rs.fileName);
                 }
 
+                if (!rs.ok) {
+                    clearBldDisplay();
+                    toastMsg('warn', rs.message || 'Không load được Ban lãnh đạo.');
+                    return;
+                }
+
                 var tenBld = normalizeBldName(rs.tenLanhDao || '');
+                currentBldList = tenBld ? [tenBld] : [];
                 setValueIfExists('banLanhDaoBox', tenBld);
                 setTextIfExists('signBanLanhDaoName', tenBld || '');
                 updatePrintWarnBar();
-                if (!rs.ok || !tenBld) {
+                if (!tenBld) {
+                    clearBldDisplay();
                     toastMsg('warn', rs.message || 'Không load được Ban lãnh đạo.');
                 }
             } catch (e) {
@@ -2930,6 +3004,162 @@
                 clearBldDisplay();
                 toastMsg('err', 'Lỗi đọc Ban lãnh đạo: ' + e.message);
             }
+        }
+
+        function getCurrentBldSignatureName() {
+            return ((document.getElementById('signBanLanhDaoName') || {}).textContent || '').replace(/\u00A0/g, ' ').trim();
+        }
+
+        function parseBldCandidatesFromText(raw) {
+            return String(raw || '')
+                .split(/[\n,;]+/)
+                .map(function (x) { return normalizeBldName(x); })
+                .filter(function (x) { return !!x; });
+        }
+
+        function uniqueNames(list) {
+            var map = {};
+            var output = [];
+            (list || []).forEach(function (name) {
+                var key = (name || '').toLowerCase();
+                if (!key || map[key]) return;
+                map[key] = true;
+                output.push(name);
+            });
+            return output;
+        }
+
+        function getBldPickerCandidates() {
+            var fromCurrent = parseBldCandidatesFromText(getCurrentBldSignatureName());
+            var fromBox = parseBldCandidatesFromText((document.getElementById('banLanhDaoBox') || {}).value || '');
+            var fromState = normalizeBldArray(currentBldList || []);
+            var defaults = normalizeBldArray(['Nguyễn Công Đức', 'Phan Hữu Giống', 'Đinh Việt Tiến', 'Lê Anh Thư']);
+            return uniqueNames([].concat(fromCurrent, fromBox, fromState, defaults));
+        }
+
+        function renderBldPicker() {
+            var sl = document.getElementById('bldPickerSelect');
+            if (!sl) return;
+
+            var candidates = getBldPickerCandidates();
+            sl.innerHTML = '';
+
+            var first = document.createElement('option');
+            first.value = '';
+            first.textContent = '-- Chọn tên ký BLD --';
+            sl.appendChild(first);
+
+            candidates.forEach(function (name) {
+                var op = document.createElement('option');
+                op.value = name;
+                op.textContent = name;
+                sl.appendChild(op);
+            });
+
+            var current = getCurrentBldSignatureName();
+            if (current && candidates.indexOf(current) >= 0) {
+                sl.value = current;
+            }
+
+            setValueIfExists('bldManualName', current);
+        }
+
+        function openBldPickerModal() {
+            renderBldPicker();
+            var modal = document.getElementById('bldPickerModal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeBldPickerModal() {
+            var modal = document.getElementById('bldPickerModal');
+            if (!modal) return;
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        function applyBldSignerName() {
+            var selectName = ((document.getElementById('bldPickerSelect') || {}).value || '').trim();
+            var manualName = normalizeBldName(((document.getElementById('bldManualName') || {}).value || '').trim());
+            var finalName = manualName || selectName;
+
+            if (!finalName) {
+                setStatus('warn', 'Chưa chọn tên Ban lãnh đạo để ký.');
+                return;
+            }
+
+            setTextIfExists('signBanLanhDaoName', finalName);
+            setValueIfExists('bldManualName', finalName);
+            updatePrintWarnBar();
+            setStatus('ok', 'Đã thay tên ký Ban lãnh đạo: ' + finalName);
+            closeBldPickerModal();
+        }
+
+        function getCurrentNguoiLapName() {
+            return ((document.getElementById('signNguoiLapName') || {}).textContent || '').replace(/\u00A0/g, ' ').trim();
+        }
+
+        function getNguoiLapPickerCandidates() {
+            var fromSchedule = toArraySafe(NGUOI_LAP_WEEKLY || []).filter(function (x) { return !!(x || '').trim(); });
+            var fromCurrent = [getCurrentNguoiLapName()];
+            return uniqueNames([].concat(fromCurrent, fromSchedule));
+        }
+
+        function renderNguoiLapPicker() {
+            var sl = document.getElementById('nguoiLapPickerSelect');
+            if (!sl) return;
+
+            var candidates = getNguoiLapPickerCandidates();
+            sl.innerHTML = '';
+
+            var first = document.createElement('option');
+            first.value = '';
+            first.textContent = '-- Chọn người lập ký --';
+            sl.appendChild(first);
+
+            candidates.forEach(function (name) {
+                var op = document.createElement('option');
+                op.value = name;
+                op.textContent = name;
+                sl.appendChild(op);
+            });
+
+            var current = getCurrentNguoiLapName();
+            if (current && candidates.indexOf(current) >= 0) {
+                sl.value = current;
+            }
+            setValueIfExists('nguoiLapManualName', current);
+        }
+
+        function openNguoiLapPickerModal() {
+            renderNguoiLapPicker();
+            var modal = document.getElementById('nguoiLapPickerModal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+        }
+
+        function closeNguoiLapPickerModal() {
+            var modal = document.getElementById('nguoiLapPickerModal');
+            if (!modal) return;
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden', 'true');
+        }
+
+        function applyNguoiLapSignerName() {
+            var selectName = ((document.getElementById('nguoiLapPickerSelect') || {}).value || '').trim();
+            var manualName = ((document.getElementById('nguoiLapManualName') || {}).value || '').trim();
+            var finalName = manualName || selectName;
+            if (!finalName) {
+                setStatus('warn', 'Chưa chọn tên người lập ký.');
+                return;
+            }
+
+            setTextIfExists('signNguoiLapName', finalName);
+            setValueIfExists('nguoiLapManualName', finalName);
+            setStatus('ok', 'Đã thay tên người lập ký: ' + finalName);
+            closeNguoiLapPickerModal();
         }
 
         function closeUploadModal() {
@@ -3744,6 +3974,13 @@
                 setStatus('warn', 'Chưa chọn ngày.');
                 return;
             }
+            if (isFutureDateIso(ngay)) {
+                stopLiveAuto();
+                currentParsedRecord = null;
+                clearPrintTable();
+                setStatus('warn', 'Ngày đã chọn lớn hơn ngày hiện tại, chưa có kết quả xổ số.');
+                return false;
+            }
 
             if (!dai) {
                 setStatus('warn', 'Chưa chọn đài.');
@@ -4148,6 +4385,19 @@
 
         window.addEventListener('keydown', function (e) {
             if (e.key !== 'Escape') return;
+
+            var nguoiLapModal = document.getElementById('nguoiLapPickerModal');
+            if (nguoiLapModal && nguoiLapModal.style.display === 'flex') {
+                closeNguoiLapPickerModal();
+                return;
+            }
+
+            var bldModal = document.getElementById('bldPickerModal');
+            if (bldModal && bldModal.style.display === 'flex') {
+                closeBldPickerModal();
+                return;
+            }
+
             var modal = document.getElementById('uploadModal');
             if (!modal || modal.style.display !== 'flex') return;
             modal.style.display = 'none';
@@ -4160,6 +4410,62 @@
 
         document.getElementById('btnUploadBld').addEventListener('click', async function () {
             await uploadBldDocx();
+        });
+
+        document.getElementById('btnOpenBldPicker').addEventListener('click', function () {
+            openBldPickerModal();
+        });
+
+        document.getElementById('btnCloseBldPicker').addEventListener('click', function () {
+            closeBldPickerModal();
+        });
+
+        document.getElementById('btnApplyBldPicker').addEventListener('click', function () {
+            applyBldSignerName();
+        });
+
+        document.getElementById('bldPickerSelect').addEventListener('change', function () {
+            setValueIfExists('bldManualName', this.value || '');
+        });
+
+        document.getElementById('bldPickerModal').addEventListener('click', function (e) {
+            if (e.target !== this) return;
+            closeBldPickerModal();
+        });
+
+        document.getElementById('bldManualName').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyBldSignerName();
+            }
+        });
+
+        document.getElementById('btnOpenNguoiLapPicker').addEventListener('click', function () {
+            openNguoiLapPickerModal();
+        });
+
+        document.getElementById('btnCloseNguoiLapPicker').addEventListener('click', function () {
+            closeNguoiLapPickerModal();
+        });
+
+        document.getElementById('btnApplyNguoiLapPicker').addEventListener('click', function () {
+            applyNguoiLapSignerName();
+        });
+
+        document.getElementById('nguoiLapPickerSelect').addEventListener('change', function () {
+            setValueIfExists('nguoiLapManualName', this.value || '');
+        });
+
+        document.getElementById('nguoiLapPickerModal').addEventListener('click', function (e) {
+            if (e.target !== this) return;
+            closeNguoiLapPickerModal();
+        });
+
+        document.getElementById('nguoiLapManualName').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                applyNguoiLapSignerName();
+            }
         });
 
         document.getElementById('hoiDongSelect').addEventListener('change', function () {
